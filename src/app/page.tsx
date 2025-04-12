@@ -4,6 +4,16 @@ import { useState, useEffect, useCallback } from "react";
 import Confetti from "react-dom-confetti";
 import { Settings } from "lucide-react";
 
+type Figure = {
+  image: string;
+  top: number;
+  left: number;
+  rotation: number;
+  size: number;
+  animationDuration: string;
+  flipped?: boolean;
+};
+
 const TequilaTimer = () => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -12,6 +22,7 @@ const TequilaTimer = () => {
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [showZero, setShowZero] = useState(false);
   const [audioTriggered, setAudioTriggered] = useState(false);
+  const [figures, setFigures] = useState<Figure[]>([]);
 
   const confettiConfig = {
     spread: 360,
@@ -21,6 +32,24 @@ const TequilaTimer = () => {
     duration: 10000,
     colors: ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff"],
   };
+
+  useEffect(() => {
+    if (showZero) {
+      const figureCount = Math.floor(Math.random() * 10) + 20;
+      const newFigures = Array.from({ length: figureCount }, () => ({
+        image: `/figures/figure${1}.png`,
+        top: Math.random() * 20 + 70,
+        left: Math.random() * 100,
+        rotation: Math.random() * 20 - 10,
+        size: 8 + Math.random() * 8, // 2-6rem
+        animationDuration: `${0.3 + Math.random() * 0.3}s`,
+        flipped: Math.random() < 0.5,
+      }));
+      setFigures(newFigures);
+    } else {
+      setFigures([]);
+    }
+  }, [showZero]);
 
   const playAlert = useCallback(async () => {
     if (!audioContext) {
@@ -162,6 +191,28 @@ const TequilaTimer = () => {
       {isCritical && !showZero && (
         <div className="mt-8 text-2xl text-red-600 animate-pulse">
           🚨 ¡Gjør klar shots! 🚨
+        </div>
+      )}
+
+      {showZero && (
+        <div className="fixed inset-0 pointer-events-none z-50 w-full h-full">
+          {figures.map((figure, index) => (
+            <img
+              key={index}
+              src={figure.image}
+              alt="Celebration figure"
+              className="absolute"
+              style={{
+                top: `${figure.top}%`,
+                left: `${figure.left}%`,
+                transform: `rotate(${figure.rotation}deg)`,
+                width: `${figure.size}rem`,
+                height: `${figure.size}rem`,
+                animation: `${figure.flipped ? "shakeFlipped" : "shakeNormal"}
+                 ${figure.animationDuration} infinite alternate`,
+              }}
+            />
+          ))}
         </div>
       )}
     </div>
