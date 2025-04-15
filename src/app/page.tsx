@@ -269,21 +269,21 @@ const LandingPage = ({ onNavigate }: { onNavigate: () => void }) => (
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
         <TimelineEvent
-          date={"2022"}
+          date={"23. Feb 2022"}
           title="Den første kvelden"
           description="4 deltagere, 3 flasker tequila og en drøm"
         />
         <TimelineEvent
-          date={"2023"}
+          date={"4. Mar 2023"}
           title="God nummer to"
           description="Ukjent antall deltagere. Lite som huskes"
         />
         <TimelineEvent
-          date={"2024"}
+          date={"26. Apr 2024"}
           title="Sliten kjellergjeng"
           description="Stappet inn i en kjeller. Fastslått som en tradisjon"
         />
-        <TimelineEvent date={"2025"} title="?" description="???" />
+        <TimelineEvent date={"19. Apr 2025"} title="?" description="???" />
       </div>
     </div>
   </div>
