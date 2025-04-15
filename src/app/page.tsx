@@ -45,7 +45,7 @@ const TequilaTimer = ({ audioContext }: TequilaTimerProps) => {
         top: Math.random() * 20 + 70,
         left: Math.random() * 100,
         rotation: Math.random() * 20 - 10,
-        size: 8 + Math.random() * 8, // 2-6rem
+        size: 8 + Math.random() * 8,
         animationDuration: `${0.3 + Math.random() * 0.3}s`,
         flipped: Math.random() < 0.5,
       }));
@@ -263,7 +263,7 @@ const LandingPage = ({ onNavigate }: { onNavigate: () => void }) => (
           onClick={onNavigate}
           className="mx-auto block bg-gradient-to-r from-pink-500 to-orange-500 hover:from-yellow-400 hover:to-pink-600 text-white px-12 py-4 rounded-full text-2xl font-bold transition-all duration-300 transform hover:scale-110 shadow-lg hover:shadow-2xl"
         >
-          🚀 Start Tequila-timer!
+          ¡Start Tequila-timer!
         </button>
       </div>
 
@@ -291,7 +291,7 @@ const LandingPage = ({ onNavigate }: { onNavigate: () => void }) => (
 
 const Logo = ({ onClick }: { onClick: () => void }) => (
   <div
-    className="fixed top-4 left-4 cursor-pointer group z-50"
+    className="absolute top-6 left-8 cursor-pointer group z-50"
     onClick={onClick}
   >
     <h1 className="text-3xl font-bold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 animate-pulse-slow drop-shadow-lg">
