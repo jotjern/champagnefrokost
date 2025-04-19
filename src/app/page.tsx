@@ -27,6 +27,7 @@ const TequilaTimer = ({ audioContext }: TequilaTimerProps) => {
   const [showZero, setShowZero] = useState(false);
   const [audioTriggered, setAudioTriggered] = useState(false);
   const [figures, setFigures] = useState<Figure[]>([]);
+  const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
 
   const confettiConfig = {
     spread: 360,
@@ -55,30 +56,43 @@ const TequilaTimer = ({ audioContext }: TequilaTimerProps) => {
     }
   }, [showZero]);
 
-  const playAlert = useCallback(async () => {
-    const source = audioContext?.createBufferSource();
-    if (source && audioContext) {
-      const response = await fetch("/tequila.mp3");
-      const arrayBuffer = await response.arrayBuffer();
-      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+  useEffect(() => {
+    if (!audioContext) return;
 
-      source.buffer = audioBuffer;
-      const gainNode = audioContext.createGain();
+    const loadAudio = async () => {
+      try {
+        const response = await fetch("/tequila.mp3");
+        const arrayBuffer = await response.arrayBuffer();
+        const decodedBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        setAudioBuffer(decodedBuffer);
+      } catch (error) {
+        console.error("Error loading audio:", error);
+      }
+    };
 
-      source.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      const startTime = audioContext.currentTime;
-      source.start(0);
-
-      gainNode.gain.setValueAtTime(1, startTime);
-      gainNode.gain.setValueAtTime(1, startTime + 55);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 60);
-
-      source.stop(startTime + 60);
-      setAudioTriggered(true);
-    }
+    loadAudio();
   }, [audioContext]);
+
+  const playAlert = useCallback(() => {
+    if (!audioContext || !audioBuffer) return;
+
+    const source = audioContext.createBufferSource();
+    source.buffer = audioBuffer;
+    const gainNode = audioContext.createGain();
+
+    source.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    const startTime = audioContext.currentTime;
+    source.start(0);
+
+    gainNode.gain.setValueAtTime(1, startTime);
+    gainNode.gain.setValueAtTime(1, startTime + 55);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 60);
+
+    source.stop(startTime + 60);
+    setAudioTriggered(true);
+  }, [audioContext, audioBuffer]);
 
   const calculateNextTarget = useCallback(() => {
     const now = Date.now();
@@ -87,6 +101,8 @@ const TequilaTimer = ({ audioContext }: TequilaTimerProps) => {
   }, [intervalsPerHour]);
 
   useEffect(() => {
+    if (!audioBuffer) return;
+
     const target = calculateNextTarget();
     setNextTarget(target);
 
@@ -94,11 +110,11 @@ const TequilaTimer = ({ audioContext }: TequilaTimerProps) => {
       const now = Date.now();
       const remaining = Math.floor((target - now) / 1000);
 
-      if (remaining <= 52 && remaining >= 50 && !audioTriggered) {
+      if (remaining == 52 && !audioTriggered) {
         playAlert();
       }
 
-      if (remaining < 50) {
+      if (remaining < 52) {
         setAudioTriggered(false);
       }
 
@@ -117,7 +133,7 @@ const TequilaTimer = ({ audioContext }: TequilaTimerProps) => {
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [nextTarget, calculateNextTarget, playAlert, audioTriggered]);
+  }, [nextTarget, calculateNextTarget, playAlert, audioTriggered, audioBuffer]);
 
   const formatTime = (seconds: number) => {
     if (showZero) return "00:00";
@@ -129,7 +145,6 @@ const TequilaTimer = ({ audioContext }: TequilaTimerProps) => {
   };
 
   const isCritical = timeLeft <= 60;
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-200 via-orange-100 to-yellow-100 flex flex-col items-center justify-center p-4 relative">
       <button
@@ -143,74 +158,89 @@ const TequilaTimer = ({ audioContext }: TequilaTimerProps) => {
           <div className="mb-4">
             <label className="flex items-center gap-2">
               Shots/time:
-              <input
-                type="number"
-                min="1"
-                max="60"
-                value={intervalsPerHour}
-                onChange={(e) =>
-                  setIntervalsPerHour(
-                    Math.max(1, Math.min(60, Number(e.target.value)))
-                  )
-                }
-                className="w-16 px-2 py-1 border rounded"
-              />
+              <div className="flex items-center">
+                <button
+                  onClick={() =>
+                    setIntervalsPerHour(Math.max(1, intervalsPerHour - 1))
+                  }
+                  className="w-8 h-8 flex items-center justify-center bg-orange-100 hover:bg-orange-200 rounded-l-md"
+                >
+                  -
+                </button>
+                <div className="w-12 py-1 text-center font-bold bg-orange-50">
+                  {intervalsPerHour}
+                </div>
+                <button
+                  onClick={() =>
+                    setIntervalsPerHour(Math.min(60, intervalsPerHour + 1))
+                  }
+                  className="w-8 h-8 flex items-center justify-center bg-orange-100 hover:bg-orange-200 rounded-r-md"
+                >
+                  +
+                </button>
+              </div>
             </label>
           </div>
         </div>
       )}
-      <div
-        className={`text-center transition-all duration-300 ${
-          showZero ? "scale-150" : "scale-100"
-        }`}
-      >
-        <div
-          className={`text-9xl font-bold mb-8 
+      {audioBuffer && (
+        <>
+          <div
+            className={`text-center transition-all duration-300 ${
+              showZero ? "scale-150" : "scale-100"
+            }`}
+          >
+            <div
+              className={`text-9xl font-bold mb-8 
           ${
             isCritical
               ? "animate-pulse bg-gradient-to-r from-red-500 to-yellow-500"
               : "bg-gradient-to-r from-blue-500 to-green-500"
           }
           text-transparent bg-clip-text`}
-        >
-          {formatTime(showZero ? 0 : timeLeft)}
-        </div>
+            >
+              {formatTime(showZero ? 0 : timeLeft)}
+            </div>
 
-        <Confetti active={showZero} config={confettiConfig} />
+            <Confetti active={showZero} config={confettiConfig} />
 
-        {showZero && (
-          <div className="animate-bounce text-4xl font-bold text-red-600">
-            🥳 ¡TEQUILA! 🥳
+            {showZero && (
+              <div className="animate-bounce text-4xl font-bold text-red-600">
+                🥳 ¡TEQUILA! 🥳
+              </div>
+            )}
           </div>
-        )}
-      </div>
-      {isCritical && !showZero && (
-        <div className="mt-8 text-2xl text-red-600 animate-pulse">
-          🚨 ¡Gjør klar shots! 🚨
-        </div>
-      )}
-      {showZero && (
-        <div className="fixed inset-0 pointer-events-none z-50 w-full h-full">
-          {figures.map((figure, index) => (
-            <Image
-              width={figure.size * 100}
-              height={figure.size * 100}
-              key={index}
-              src={figure.image}
-              alt="Celebration figure"
-              className="absolute"
-              style={{
-                top: `${figure.top}%`,
-                left: `${figure.left}%`,
-                transform: `rotate(${figure.rotation}deg)`,
-                width: `${figure.size}rem`,
-                height: `${figure.size}rem`,
-                animation: `${figure.flipped ? "shakeFlipped" : "shakeNormal"}
+          {isCritical && !showZero && (
+            <div className="mt-8 text-2xl text-red-600 animate-pulse">
+              🚨 ¡Gjør klar shots! 🚨
+            </div>
+          )}
+          {showZero && (
+            <div className="fixed inset-0 pointer-events-none z-50 w-full h-full">
+              {figures.map((figure, index) => (
+                <Image
+                  width={figure.size * 100}
+                  height={figure.size * 100}
+                  key={index}
+                  src={figure.image}
+                  alt="Celebration figure"
+                  className="absolute"
+                  style={{
+                    top: `${figure.top}%`,
+                    left: `${figure.left}%`,
+                    transform: `rotate(${figure.rotation}deg)`,
+                    width: `${figure.size}rem`,
+                    height: `${figure.size}rem`,
+                    animation: `${
+                      figure.flipped ? "shakeFlipped" : "shakeNormal"
+                    }
                  ${figure.animationDuration} infinite alternate`,
-              }}
-            />
-          ))}
-        </div>
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
