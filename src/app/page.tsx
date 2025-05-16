@@ -266,7 +266,7 @@ const LandingPage = ({ onNavigate }: { onNavigate: () => void }) => (
         <p className="text-xl text-black mb-8 leading-relaxed">
           Gjør dere klare for{" "}
           <span className="font-bold text-[#00205B]">
-            ChampagneFrokost 2025
+            Champagnefrokost 2025
           </span>
           ! Vi feirer eksamensperioden og barnas dag med å drikke oss kanakkas
           drita klokken 9 om morgenen 🥳.
@@ -287,16 +287,12 @@ const Logo = ({ onClick }: { onClick: () => void }) => (
     className="absolute top-6 left-8 cursor-pointer group z-50"
     onClick={onClick}
   >
-    <h1 className="text-3xl font-extrabold text-center  drop-shadow-lg animate-pulse-slow">
-      <span className="bg-clip-text text-transparent bg-[url('/bg.png')] bg-[length:100%_100%] bg-no-repeat">
-        🍾
-      </span>{" "}
-      <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#BA0C2F] to-[#00205B]">
-        ChampagneFrokost 2025
+    <h1 className="text-3xl font-extrabold text-center drop-shadow-lg animate-pulse-slow">
+      <span className="bg-clip-text text-transparent bg-[#ba0c2f]">🍾</span>
+      <span className="bg-clip-text mx-2 text-transparent bg-gradient-to-r from-[#BA0C2F] to-[#00205B]">
+        Champagnefrokost
       </span>
-      <span className="bg-clip-text text-transparent bg-[url('/bg.png')] bg-[length:100%_100%] bg-no-repeat">
-        🍾
-      </span>{" "}
+      <span className="bg-clip-text text-transparent bg-[#00205B]">🍾</span>
     </h1>
   </div>
 );
