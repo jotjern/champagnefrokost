@@ -4,6 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import Confetti from "react-dom-confetti";
 import { Settings } from "lucide-react";
 import Image from "next/image";
+import SpotifyStatusButton from "@/components/SpotifyStatusIcon";
+import { SessionProvider } from "next-auth/react";
+import Link from "next/link";
 
 type Figure = {
   image: string;
@@ -92,6 +95,16 @@ const ChampagneTimer = ({
 
     source.stop(startTime + 60);
     setAudioTriggered(true);
+
+    fetch(`/api/set-spotify-volume?target_volume=0`).then(async (response) => {
+      const data = await response.json();
+      const start_volume = data["start_volume"];
+
+      setTimeout(
+        () => fetch(`/api/set-spotify-volume?target_volume=${start_volume}`),
+        42 * 1000
+      );
+    });
   }, [audioContext, audioBuffer]);
 
   const calculateNextTarget = useCallback(() => {
