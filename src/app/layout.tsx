@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Champagnefrokost",
-  description: "Nettsiden for Champagnefrokost",
+  title: "ChampagneFrokost",
+  description: "Nettsiden for ChampagneFrokost",
 };
 
 export default function RootLayout({

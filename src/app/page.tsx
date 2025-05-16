@@ -269,7 +269,7 @@ const LandingPage = ({ onNavigate }: { onNavigate: () => void }) => (
         <p className="text-xl text-black mb-8 leading-relaxed">
           Gjør dere klare for{" "}
           <span className="font-bold text-[#00205B]">
-            Champagnefrokost 2025
+            ChampagneFrokost 2025
           </span>
           ! Vi feirer eksamensperioden og barnas dag med å drikke oss kanakkas
           drita klokken 9 om morgenen 🥳
@@ -295,7 +295,7 @@ const Logo = ({ onClick }: { onClick: () => void }) => (
         🍾
       </span>{" "}
       <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#BA0C2F] to-[#00205B]">
-        Champagnefrokost 2025
+        ChampagneFrokost 2025
       </span>
       <span className="bg-clip-text text-transparent bg-[url('/bg.png')] bg-[length:100%_100%] bg-no-repeat">
         🍾
