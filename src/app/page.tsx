@@ -99,7 +99,7 @@ const ChampagneTimer = ({
 
       setTimeout(
         () => fetch(`/api/set-spotify-volume?target_volume=${start_volume}`),
-        42 * 1000
+        39 * 1000
       );
     });
   }, [audioContext, audioBuffer]);
@@ -269,7 +269,7 @@ const LandingPage = ({ onNavigate }: { onNavigate: () => void }) => (
             ChampagneFrokost 2025
           </span>
           ! Vi feirer eksamensperioden og barnas dag med å drikke oss kanakkas
-          drita klokken 9 om morgenen 🥳
+          drita klokken 9 om morgenen 🥳.
         </p>
         <button
           onClick={onNavigate}
