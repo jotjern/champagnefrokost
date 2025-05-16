@@ -4,9 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import Confetti from "react-dom-confetti";
 import { Settings } from "lucide-react";
 import Image from "next/image";
-import SpotifyStatusButton from "@/components/SpotifyStatusIcon";
-import { SessionProvider } from "next-auth/react";
-import Link from "next/link";
 
 type Figure = {
   image: string;

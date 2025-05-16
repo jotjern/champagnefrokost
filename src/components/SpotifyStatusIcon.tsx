@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default async function SpotifyStatusButton() {
-  let session: Session | null = await getServerSession(authOptions);
+  const session: Session | null = await getServerSession(authOptions);
 
   return (
     <div className="absolute bottom-0 right-0 p-4">
