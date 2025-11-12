@@ -4,8 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Confetti from "react-dom-confetti";
 import { Settings } from "lucide-react";
 import Image from "next/image";
-import SpotifyStatusButton from "@/components/SpotifyStatusIcon";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import Link from "next/link";
 
 type Figure = {
@@ -102,7 +101,7 @@ const TequilaTimer = ({ audioContext }: TequilaTimerProps) => {
 
       setTimeout(
         () => fetch(`/api/set-spotify-volume?target_volume=${start_volume}`),
-        42 * 1000
+        55 * 1000
       );
     });
   }, [audioContext, audioBuffer]);
@@ -158,6 +157,7 @@ const TequilaTimer = ({ audioContext }: TequilaTimerProps) => {
   };
 
   const isCritical = timeLeft <= 60;
+  const session = useSession();
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-200 via-orange-100 to-yellow-100 flex flex-col items-center justify-center p-4 relative">
       <button
@@ -168,7 +168,7 @@ const TequilaTimer = ({ audioContext }: TequilaTimerProps) => {
       </button>
       {settingsOpen && (
         <div className="absolute top-16 right-4 bg-white p-4 rounded-lg shadow-lg text-black">
-          <div className="mb-4">
+          <div className="flex flex-col gap-2">
             <label className="flex items-center gap-2">
               Shots/time:
               <div className="flex items-center">
@@ -192,6 +192,22 @@ const TequilaTimer = ({ audioContext }: TequilaTimerProps) => {
                   +
                 </button>
               </div>
+            </label>
+            <label className="flex justify-between gap-2">
+              Spotify:
+              <Link
+                href={
+                  session.status === "authenticated"
+                    ? "/api/auth/signout/spotify"
+                    : "/api/auth/signin/spotify"
+                }
+                className={
+                  "flex px-2 items-center justify-between rounded-xl " +
+                  (session.status === "authenticated" ? "bg-green-600 text-white" : "bg-gray-600 text-white")
+                }
+              >
+                <span>{session.status === "authenticated" ? "Trykk for å avkoble" : "Trykk for å koble"}</span>
+              </Link>
             </label>
           </div>
         </div>
@@ -354,14 +370,16 @@ export default function App() {
   };
 
   return (
-    <div className="relative overflow-hidden">
-      <Logo onClick={() => setCurrentPage("home")} />
+    <SessionProvider>
+      <div className="relative overflow-hidden">
+        <Logo onClick={() => setCurrentPage("home")} />
 
-      {currentPage === "home" ? (
-        <LandingPage onNavigate={handleNavigateToTimer} />
-      ) : (
-        <TequilaTimer audioContext={audioContext} />
-      )}
-    </div>
+        {currentPage === "home" ? (
+          <LandingPage onNavigate={handleNavigateToTimer} />
+        ) : (
+          <TequilaTimer audioContext={audioContext} />
+        )}
+      </div>
+    </SessionProvider>
   );
 }

@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
       throw new Error(await response.text());
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 250));
+    await new Promise((resolve) => setTimeout(resolve, 175));
   }
 
   return NextResponse.json({ start_volume });
